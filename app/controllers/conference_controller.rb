@@ -5,7 +5,7 @@ class ConferenceController < ApplicationController
   load_resource :program, through: :conference, singleton: true, except: :index
 
   def index
-    @current = Conference.where('end_date >= ?', Date.current).order('start_date ASC')
+    @current = Conference.where('end_date >= ?', Date.current).reorder(start_date: :asc)
     @antiquated = @conferences - @current
   end
 
@@ -14,6 +14,7 @@ class ConferenceController < ApplicationController
   def schedule
     @rooms = @conference.venue.rooms if @conference.venue
     @events = @conference.program.events
+    @events_xml = @events.scheduled.order(start_time: :asc).group_by{ |event| event.start_time.to_date }
     @dates = @conference.start_date..@conference.end_date
 
     if @dates == Date.current
