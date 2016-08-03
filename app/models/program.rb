@@ -27,7 +27,11 @@ class Program < ActiveRecord::Base
     end
 
     def scheduled
-      where.not(start_time: nil).where.not(room: nil)
+      where.not(start_time: nil).where.not(room: nil).order(start_time: :asc)
+    end
+
+    def unscheduled
+      confirmed.where('start_time IS NULL OR room_id IS NULL')
     end
 
     def highlights
@@ -47,11 +51,57 @@ class Program < ActiveRecord::Base
   accepts_nested_attributes_for :difficulty_levels, allow_destroy: true
 
 #   validates :conference_id, presence: true, uniqueness: true
-  validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
+  validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 10, only_integer: true }
+  validate :voting_start_date_before_end_date
+  validate :voting_dates_exist
 
   before_create :create_event_types
   before_create :create_difficulty_levels
   validate :check_languages_format
+
+  ##
+  # Checks if blind_voting is enabled and if voting period is over
+  # ====Returns
+  # * +true+ -> If we can show voting details
+  # * +false+ -> If we cannot show voting details
+  def show_voting?
+    return true unless blind_voting
+
+    Date.today > voting_end_date
+  end
+
+  ##
+  # Checks if we are still in voting period
+  # ====Returns
+  # * +true+ -> If the voting period is not over yet
+  # * +false+ -> If the voting period is over
+  def voting_period?
+    return false unless voting_start_date && voting_end_date
+
+    (voting_start_date.to_datetime..voting_end_date.to_datetime).cover? Time.current
+  end
+
+  ##
+  # Checks if both voting_start_date and voting_end_date are set
+  # ====Returns
+  # Errors when the condition is not true
+  def voting_dates_exist
+    errors.add(:voting_start_date, 'must be set, when blind voting is enabled') if blind_voting && !voting_start_date && !voting_end_date
+
+    errors.add(:voting_end_date, 'must be set, when blind voting is enabled') if blind_voting && !voting_start_date && !voting_end_date
+
+    errors.add(:voting_end_date, 'must be set, when voting_start_date is set') if voting_start_date && !voting_end_date
+
+    errors.add(:voting_start_date, 'must be set, when voting_end_date is set') if voting_end_date && !voting_start_date
+  end
+
+  ##
+  # Checks if voting_start_date is before voting_end_date
+  # ====Returns
+  # Errors when the condition is not true
+  def voting_start_date_before_end_date
+    errors.add(:voting_start_date, 'must be before voting end date') if voting_start_date && voting_end_date && voting_start_date > voting_end_date
+  end
 
   ##
   # Checcks if the program has rating enabled
@@ -85,6 +135,17 @@ class Program < ActiveRecord::Base
 
   def languages_list
     self.languages.split(',').map {|l| ISO_639.find(l).english_name} if self.languages.present?
+  end
+
+  ##
+  # Checks if there is any event in the program that starts in the given date
+  #
+  # ====Returns
+  # * +True+ -> If there is any event for the given date
+  # * +False+ -> If there is not any event for the given date
+  def any_event_for_this_date?(date)
+    parsed_date = DateTime.parse("#{date} 00:00").utc
+    events.where(start_time: parsed_date..(parsed_date + 1)).any?
   end
 
   private

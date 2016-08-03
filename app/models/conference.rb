@@ -595,6 +595,35 @@ class Conference < ActiveRecord::Base
     registration_limit > 0 && registrations.count >= registration_limit
   end
 
+  # Returns an hexadecimal color given a collection. The returned color changed
+  # when the number of element in the collection changes and for consecutive
+  # number of elements it returns highly different colors.
+  def next_color_for_collection(collection)
+    # we have different start indices for every collection to generate a
+    # different color for every of them.
+    start_index = {
+      tracks: (program.tracks.count + 1),
+      levels: (program.difficulty_levels.count + 51),
+      types: (program.event_types.count + 101)
+    }
+    next_color(start_index[collection])
+  end
+
+  # Returns the current day if it is a day of the schedule or nil otherwise
+  def current_conference_day
+    day = Time.find_zone(timezone).today
+    day if (start_date..end_date).cover? day
+  end
+
+  # Returns the number of hours since the conference start hour (9) to the
+  # current hour, in case that the current hour is beetween the start and the
+  # end hour (20). Otherwise, returns 0
+  def hours_from_start_time(start_hour, end_hour)
+    current_time = Time.find_zone(timezone).now
+    current_hour = current_time.strftime('%H').to_i
+    (start_hour..(end_hour-1)).cover?(current_hour) ? current_hour - start_hour : 0
+  end
+
   private
 
   # Returns a different html colour for every i and consecutive colors are

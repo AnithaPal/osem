@@ -252,12 +252,15 @@ ActiveRecord::Schema.define(version: 20160624151257) do
 
   create_table "programs", force: :cascade do |t|
     t.integer  "conference_id"
-    t.integer  "rating",          default: 0
-    t.boolean  "schedule_public", default: false
-    t.boolean  "schedule_fluid",  default: false
+    t.integer  "rating",            default: 0
+    t.boolean  "schedule_public",   default: false
+    t.boolean  "schedule_fluid",    default: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "languages"
+    t.boolean  "blind_voting",      default: false
+    t.datetime "voting_start_date"
+    t.datetime "voting_end_date"
   end
 
   create_table "qanswers", force: :cascade do |t|

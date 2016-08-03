@@ -1,5 +1,17 @@
 module ApplicationHelper
   ##
+  # Checks if the voting has already started, or if it has already ended
+  #
+  def voting_open_or_close(program)
+    return if program.voting_period?
+    if program.voting_start_date > Date.today
+      return 'Voting period has not started yet!'
+    else # voting_end_date > Date.today because voting_start_date < voting_end_date
+      return 'Voting period is over!'
+    end
+  end
+
+  ##
   # Gets an EventType object, and returns its length in timestamp format (HH:MM)
   # ====Gets
   # * +Integer+ -> 30
@@ -7,6 +19,15 @@ module ApplicationHelper
   # * +String+ -> "00:30"
   def length_timestamp(length)
     [length / 60, length % 60].map { |t| t.to_s.rjust(2, '0') }.join(':')
+  end
+
+  ##
+  # Gets a datetime object
+  # ====Returns
+  # * +String+ -> formated datetime object
+  def format_datetime(obj)
+    return unless obj
+    obj.strftime('%Y-%m-%d %H:%M')
   end
 
   ##
@@ -334,5 +355,15 @@ module ApplicationHelper
   def speaker_width(rooms)
     # speaker picture padding: 4px 2px; and we want the picture to be a circle
     speaker_height(rooms) - 4
+  end
+
+  def carousel_item_class(number, carousel_number, num_cols, col)
+    item_class = 'item'
+    item_class += ' first' if number == 0
+    item_class += ' last' if number == (carousel_number - 1)
+    if (col && ((col / num_cols) == number)) || (!col && number == 0)
+      item_class += ' active'
+    end
+    item_class
   end
 end
