@@ -1,3 +1,52 @@
+
+.room-name{
+  font-weight: bold;
+  padding:10px;
+  margin-top: 30px;
+  border: 1px solid #848484;
+  background-color: #E6E6E6;
+
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  height: 40px;
+  line-height: 25px;
+  overflow: hidden;
+}
+
+.schedule-room-slot{
+  padding: 2px 5px;
+  border: 1px solid #848484;
+  height: 58px;
+  line-height: 20px;
+  font-size: 13px;
+}
+
+.schedule-event{
+  padding: 7px;
+  border: 2px solid #151515;
+  position:relative;
+  z-index:1;
+  cursor:move;
+}
+
+.schedule-event-text{
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  line-height: 23px;
+  overflow: hidden;
+}
+
+.schedule-event-delete-button {
+    font-weight:bold;
+    cursor: pointer;
+    padding: 0px 3px;
+    border: 1px solid grey;
+    margin-right: 5px;
+}
+
 #schedule td.event {
 background-image: linear-gradient(bottom, rgb(247,250,242) 24%, rgb(194,232,190) 97%, rgb(194,232,190) 100%);
 background-image: -o-linear-gradient(bottom, rgb(247,250,242) 24%, rgb(194,232,190) 97%, rgb(194,232,190) 100%);
@@ -62,6 +111,12 @@ background-image: -webkit-gradient(
 .schedule-subtitle {
     color: rgb(185, 74, 72);
 }
+
+a.unstyled-link {
+  text-decoration: none;
+  color: #333333;
+  outline: 0;
+ }
 
 .program-dropdown, .schedule-dropdown{
   margin-left: 20%;
@@ -197,6 +252,9 @@ td.no-padding{
   overflow: hidden;
   display: inline-block;
   white-space: normal;
+  padding-left: 1px;
+  padding-right: 1px;
+  font-size: 7px;
 }
 
 /* Small devices (tablets, 768px and up) */
@@ -215,7 +273,12 @@ td.no-padding{
   }
 
   td.event{
-    padding: 3px 4px !important;
+    padding: 3px 3px !important;
+  }
+
+  .schedule-label{
+    padding-left: 2px;
+    padding-right: 3px;
   }
 }
 
@@ -230,13 +293,10 @@ td.no-padding{
     max-width: 10%;
   }
 
-  td.event{
-    padding: 3px 5px !important;
-  }
-
   .schedule-label{
     height: 15px;
     line-height: 12px;
+    font-size: 7px;
   }
 }
 
@@ -244,6 +304,12 @@ td.no-padding{
 @media (min-width: 1200px) {
   .room, .event-title{
     font-size: 14px;
+  }
+
+  .schedule-label{
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 8px;
   }
 
   td.room{
