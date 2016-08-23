@@ -19,6 +19,11 @@ Osem::Application.routes.draw do
 
   namespace :admin do
     resources :users
+    resources :users do
+      member do
+        patch :toggle_confirmation
+      end
+    end
     resources :comments, only: [:index]
     resources :conference do
       resource :contact, except: [:index, :new, :create, :show, :destroy]
@@ -116,6 +121,7 @@ Osem::Application.routes.draw do
     resource :conference_registration, path: 'register'
     resources :tickets, only: [:index]
     resources :ticket_purchases, only: [:create, :destroy]
+    resources :payments, only: [:index, :new, :create]
     resource :subscriptions, only: [:create, :destroy]
     resource :schedule, only: [:show] do
       member do

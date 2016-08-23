@@ -15,10 +15,48 @@ describe ApplicationHelper, type: :helper do
     end
   end
 
+  describe 'show_time' do
+    it 'when length > 60' do
+      expect(show_time(67)).to eq '1 h 7 min'
+    end
+
+    it 'when length = 60' do
+      expect(show_time(60)).to eq '1 h'
+    end
+
+    it 'when length < 60' do
+      expect(show_time(58)).to eq '58 min'
+    end
+
+    it 'when length > 60 and is a decimal number' do
+      expect(show_time(68.3)).to eq '1 h 8 min'
+    end
+
+    it 'when length is nil' do
+      expect(show_time(nil)).to eq '0 h 0 min'
+    end
+  end
+
   describe 'show_roles' do
     it 'formats the hash passed' do
       roles = { 'organizer' => ['oSC16', 'oSC15'], 'cfp' => ['oSC16'] }
       expect(show_roles(roles)).to eq 'Organizer (oSC16, oSC15), Cfp (oSC16)'
+    end
+  end
+
+  describe 'markdown' do
+    it 'should return empty string for nil' do
+      expect(markdown(nil)).to eq ''
+    end
+
+    it 'should return HTML for header markdown' do
+      expect(Redcarpet::Markdown).to receive(:new).
+        with(Redcarpet::Render::HTML, autolink: true,
+                                      space_after_headers: true,
+                                      no_intra_emphasis: true).
+        and_call_original
+
+      expect(markdown('# this is my header')).to eq "<h1>this is my header</h1>\n"
     end
   end
 

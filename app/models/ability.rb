@@ -81,6 +81,7 @@ class Ability
 
     can :index, Ticket
     can :manage, TicketPurchase, user_id: user.id
+    can [:new, :create], Payment, user_id: user.id
 
     can [:create, :destroy], Subscription, user_id: user.id
 
@@ -209,6 +210,12 @@ class Ability
     can :toggle_user, Role do |role|
       role.resource_type == 'Conference' && role.name == 'cfp' &&
       (Conference.with_role(:cfp, user).pluck(:id).include? role.resource_id)
+    end
+
+    can [:index, :revert_object, :revert_attribute], PaperTrail::Version, item_type: 'Event', conference_id: conf_ids_for_cfp
+    can [:index, :revert_object, :revert_attribute], PaperTrail::Version do |version|
+      version.item_type == 'Commercial' && conf_ids_for_cfp.include?(version.conference_id) &&
+      (version.object.to_s.include?('Event') || version.object_changes.to_s.include?('Event'))
     end
   end
 
